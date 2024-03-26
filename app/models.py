@@ -25,10 +25,12 @@ class Flight(models.Model):
     departure = models.CharField(blank=False, null=False, max_length=250)
     destination = models.CharField(blank=False, null=False, max_length=250)
     departureDate = models.DateField(blank=False, null=False)
-    departureTime = models.TimeField(blank=False, null=False)
-    arrivalTime = models.TimeField(blank=False, null=False)
+    returnDate = models.DateField(blank=False, null=False)
+    departureDepartureTime = models.TimeField(blank=False, null=False)
+    departureArrivalTime = models.TimeField(blank=False, null=False)
+    returnDepartureTime = models.TimeField(blank=False, null=False)
+    returnArrivalTime = models.TimeField(blank=False, null=False)
     price = models.FloatField(blank=False, null=False)
-    capacity = models.IntegerField(blank=False, null=False)
     remainingSeats = models.IntegerField(blank=False, null=False)
 
 class Activity(models.Model):
