@@ -1,0 +1,319 @@
+openapi: 3.0.3
+info:
+  title: Your Project API
+  version: 1.0.0
+  description: Your project description
+paths:
+  /activity/:
+    get:
+      operationId: activity_list
+      parameters:
+      - in: query
+        name: ciudad
+        schema:
+          type: string
+        description: Ciudad de la actividad
+        required: true
+      - in: query
+        name: fechaInicio
+        schema:
+          type: string
+        description: Fecha de la actividad
+        required: true
+      - in: query
+        name: precioMax
+        schema:
+          type: string
+        description: Precio máximo de la actividad
+        required: true
+      - in: query
+        name: tipo
+        schema:
+          type: string
+        description: Tipo de actividad
+        required: true
+      tags:
+      - activity
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ActivitySerializers'
+          description: ''
+  /activityType/:
+    get:
+      operationId: activityType_list
+      tags:
+      - activityType
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ActivitySerializers'
+          description: ''
+  /flight/:
+    get:
+      operationId: flight_list
+      parameters:
+      - in: query
+        name: destino
+        schema:
+          type: string
+        description: Destino del vuelo
+        required: true
+      - in: query
+        name: fechaRegreso
+        schema:
+          type: string
+        description: Fecha de regreso del vuelo
+        required: true
+      - in: query
+        name: fechaSalida
+        schema:
+          type: string
+        description: Fecha de salida del vuelo
+        required: true
+      - in: query
+        name: origen
+        schema:
+          type: string
+        description: Origen del vuelo
+        required: true
+      - in: query
+        name: precioMax
+        schema:
+          type: string
+        description: Precio máximo del vuelo
+        required: true
+      - in: query
+        name: viajeros
+        schema:
+          type: string
+        description: Numero de viajeros
+        required: true
+      tags:
+      - flight
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FlightSerializers'
+          description: ''
+  /hotel/:
+    get:
+      operationId: hotel_list
+      parameters:
+      - in: query
+        name: ciudad
+        schema:
+          type: string
+        description: Ciudad del hotel
+        required: true
+      - in: query
+        name: fechaFin
+        schema:
+          type: string
+        description: Fecha final de la estancia
+        required: true
+      - in: query
+        name: fechaInicio
+        schema:
+          type: string
+        description: Fecha de inicio de la estancia
+        required: true
+      - in: query
+        name: precioMax
+        schema:
+          type: string
+        description: Precio máximo total de la estancia
+        required: true
+      - in: query
+        name: residentes
+        schema:
+          type: string
+        description: Numero de residentes
+        required: true
+      tags:
+      - hotel
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HotelSerializers'
+          description: ''
+components:
+  schemas:
+    ActivitySerializers:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 250
+        description:
+          type: string
+          maxLength: 1000
+        type:
+          type: string
+          maxLength: 250
+        city:
+          type: string
+          maxLength: 250
+        address:
+          type: string
+          maxLength: 250
+        date:
+          type: string
+          format: date
+        startTime:
+          type: string
+          format: time
+        duration:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        price:
+          type: number
+          format: double
+        phone:
+          type: string
+          nullable: true
+          maxLength: 15
+      required:
+      - address
+      - city
+      - date
+      - description
+      - duration
+      - id
+      - price
+      - startTime
+      - title
+      - type
+    FlightSerializers:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        airline:
+          type: string
+          maxLength: 250
+        departure:
+          type: string
+          maxLength: 250
+        destination:
+          type: string
+          maxLength: 250
+        departureDate:
+          type: string
+          format: date
+        returnDate:
+          type: string
+          format: date
+        departureDepartureTime:
+          type: string
+          format: time
+        departureArrivalTime:
+          type: string
+          format: time
+        returnDepartureTime:
+          type: string
+          format: time
+        returnArrivalTime:
+          type: string
+          format: time
+        price:
+          type: number
+          format: double
+        remainingSeats:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+      required:
+      - airline
+      - departure
+      - departureArrivalTime
+      - departureDate
+      - departureDepartureTime
+      - destination
+      - id
+      - price
+      - remainingSeats
+      - returnArrivalTime
+      - returnDate
+      - returnDepartureTime
+    HotelSerializers:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 250
+        city:
+          type: string
+          maxLength: 250
+        address:
+          type: string
+          maxLength: 250
+        phone:
+          type: string
+          nullable: true
+          maxLength: 15
+        stars:
+          type: integer
+          maximum: 5
+          minimum: 1
+        image:
+          type: string
+          format: uri
+          maxLength: 1000
+      required:
+      - address
+      - city
+      - id
+      - image
+      - name
+      - stars
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
