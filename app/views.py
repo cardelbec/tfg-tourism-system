@@ -69,7 +69,7 @@ class Hotel_APIView(APIView):
         fechaFin = request.GET.get('fechaFin', '')
         fechaFin = datetime.strptime(fechaFin, '%Y-%m-%d').date()
         precioMax = float(request.GET.get('precioMax', ''))
-        hotels = Hotel.objects.filter(city__iin = ciudad)
+        hotels = Hotel.objects.filter(city__iin = ciudad).order_by("-stars")[:3]
         hotels = searchRooms(hotels, residentes, fechaInicio, fechaFin, precioMax)
         serializer = HotelSerializers(hotels, many=True)
         
@@ -99,7 +99,7 @@ class Flight_APIView(APIView):
         fechaRegreso = request.GET.get('fechaRegreso', '')
         fechaRegreso = datetime.strptime(fechaRegreso, '%Y-%m-%d').date()
         precioMax = float(request.GET.get('precioMax', ''))
-        flights = Flight.objects.filter(destination__iin=destino).filter(departure__iin=origen).filter(departureDate=fechaSalida).filter(returnDate=fechaRegreso).filter(price__lte=precioMax).filter(remainingSeats__lte=viajeros)
+        flights = Flight.objects.filter(destination__iin=destino).filter(departure__iin=origen).filter(departureDate=fechaSalida).filter(returnDate=fechaRegreso).filter(price__lte=precioMax).filter(remainingSeats__lte=viajeros).order_by("price")[:3]
         serializer = FlightSerializers(flights, many=True)
         
         return Response(serializer.data)
@@ -123,7 +123,7 @@ class Activity_APIView(APIView):
         hora = request.GET.get('hora', '')
         hora = datetime.strptime(hora, '%H:%M:%S').time()
         precioMax = float(request.GET.get('precioMax', ''))
-        activities = Activity.objects.filter(city__iin=ciudad).filter(type=tipo).filter(date=fecha).filter(startTime__gte=hora).filter(price__lte=precioMax)
+        activities = Activity.objects.filter(city__iin=ciudad).filter(type=tipo).filter(date=fecha).filter(startTime__gte=hora).filter(price__lte=precioMax).order_by("price")[:3]
         serializer = ActivitySerializers(activities, many=True)
         
         return Response(serializer.data)
