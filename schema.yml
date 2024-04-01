@@ -167,7 +167,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/HotelSerializers'
+                  $ref: '#/components/schemas/RoomSerializers'
           description: ''
 components:
   schemas:
@@ -275,39 +275,35 @@ components:
       - returnArrivalTime
       - returnDate
       - returnDepartureTime
-    HotelSerializers:
+    RoomSerializers:
       type: object
       properties:
-        id:
+        capacity:
           type: integer
-          readOnly: true
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        price:
+          type: number
+          format: double
         name:
           type: string
-          maxLength: 250
-        city:
-          type: string
-          maxLength: 250
+          readOnly: true
         address:
           type: string
-          maxLength: 250
+          readOnly: true
         phone:
           type: string
-          nullable: true
-          maxLength: 15
+          readOnly: true
         stars:
-          type: integer
-          maximum: 5
-          minimum: 1
-        image:
           type: string
-          format: uri
-          maxLength: 1000
+          readOnly: true
       required:
       - address
-      - city
-      - id
-      - image
+      - capacity
       - name
+      - phone
+      - price
       - stars
   securitySchemes:
     basicAuth:

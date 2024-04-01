@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import HotelSerializers, FlightSerializers, ActivitySerializers
+from .serializers import FlightSerializers, ActivitySerializers, RoomSerializers
 from .models import Hotel, Room, Booking, Flight, Activity
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from datetime import datetime
@@ -45,13 +45,13 @@ def searchRooms(hotels, residentes, fechaInicio, fechaFin, precioMax):
                             goodRoom = False
                             break
                     if goodRoom:
-                        filteredHotels.append(h)
+                        filteredHotels.append(r)
 
         return filteredHotels
 
 class Hotel_APIView(APIView):
 
-    @extend_schema(responses= HotelSerializers(many=True),
+    @extend_schema(responses= RoomSerializers(many=True),
                    parameters=[
         OpenApiParameter(name='ciudad',location=OpenApiParameter.QUERY, description='Ciudad del hotel', required=True, type=str),
         OpenApiParameter(name='residentes',location=OpenApiParameter.QUERY, description='Numero de residentes', required=True, type=str),
@@ -71,7 +71,7 @@ class Hotel_APIView(APIView):
         precioMax = float(request.GET.get('precioMax', ''))
         hotels = Hotel.objects.filter(city__iin = ciudad).order_by("-stars")[:3]
         hotels = searchRooms(hotels, residentes, fechaInicio, fechaFin, precioMax)
-        serializer = HotelSerializers(hotels, many=True)
+        serializer = RoomSerializers(hotels, many=True)
         
         return Response(serializer.data)
 
@@ -99,7 +99,7 @@ class Flight_APIView(APIView):
         fechaRegreso = request.GET.get('fechaRegreso', '')
         fechaRegreso = datetime.strptime(fechaRegreso, '%Y-%m-%d').date()
         precioMax = float(request.GET.get('precioMax', ''))
-        flights = Flight.objects.filter(destination__iin=destino).filter(departure__iin=origen).filter(departureDate=fechaSalida).filter(returnDate=fechaRegreso).filter(price__lte=precioMax).filter(remainingSeats__lte=viajeros).order_by("price")[:3]
+        flights = Flight.objects.filter(destination__iin=destino).filter(departure__iin=origen).filter(departureDate=fechaSalida).filter(returnDate=fechaRegreso).filter(price__lte=precioMax).filter(remainingSeats__gte=viajeros).order_by("price")[:3]
         serializer = FlightSerializers(flights, many=True)
         
         return Response(serializer.data)
