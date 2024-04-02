@@ -10,6 +10,7 @@ from django.db.models.lookups import In
 import unidecode
 import functions_framework
 from django.views.decorators.csrf import csrf_exempt
+import json
 
 @Field.register_lookup
 class IIn(In):
@@ -144,12 +145,13 @@ class ActivityType_APIView(APIView):
 @functions_framework.http
 @csrf_exempt
 def handleWebhook(request):
-    intent = request.POST.get('queryResult', '').get('intent', '').get('displayName', '')
+    req = json.loads(request.body)
+    intent = req['queryResult']['intent']['displayName']
 
     responseText = ""
 
     if intent == "Intent Busqueda Hoteles":
-        responseText = webhookSearchHotels(request)
+        responseText = webhookSearchHotels(req)
     elif intent == "get-agent-name":
         responseText = "My name is Flowhook"
     else:
@@ -159,14 +161,14 @@ def handleWebhook(request):
 
     return res
 
-def webhookSearchHotels(request):
-    ciudad = request.POST.get('queryResult', '').get('parameters', '').get('ciudad', '')
-    residentes = request.POST.get('queryResult', '').get('parameters', '').get('residentes', '')
-    fechaInicio = request.POST.get('queryResult', '').get('parameters', '').get('fechaInicio', '')[0:10]
+def webhookSearchHotels(req):
+    ciudad = req['queryResult']['parameters']['ciudad']
+    residentes = req['queryResult']['parameters']['residentes']
+    fechaInicio = req['queryResult']['parameters']['fechaInicio'][0:10]
     fechaInicio = datetime.strptime(fechaInicio, '%Y-%m-%d').date()
-    fechaFin = request.POST.get('queryResult', '').get('parameters', '').get('fechaFin', '')[0:10]
+    fechaFin = req['queryResult']['parameters']['fechaFin'][0:10]
     fechaFin= datetime.strptime(fechaFin, '%Y-%m-%d').date()
-    precioMax = request.POST.get('queryResult', '').get('parameters', '').get('precioMax', '')
+    precioMax = req['queryResult']['parameters']['precioMax']
     responseText = ""
 
     hotels = Hotel.objects.filter(city__iin = ciudad).order_by("-stars")[:3]
