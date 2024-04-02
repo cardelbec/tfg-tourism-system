@@ -162,7 +162,9 @@ def webhookSearchHotels(req):
     ciudad = req["queryResult"]["parameters"]["ciudad"]
     residentes = req["queryResult"]["parameters"]["residentes"]
     fechaInicio = req["queryResult"]["parameters"]["fechaInicio"][0:10]
+    fechaInicio = datetime.strptime(fechaInicio, '%Y-%m-%d').date()
     fechaFin = req["queryResult"]["parameters"]["fechaFin"][0:10]
+    fechaFin= datetime.strptime(fechaFin, '%Y-%m-%d').date()
     precioMax = req["queryResult"]["parameters"]["precioMax"]
     responseText = ""
 
