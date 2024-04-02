@@ -145,6 +145,8 @@ def handleWebhook(request):
     req = request.get_json()
     intent = req["queryResult"]["intent"]["displayName"]
 
+    responseText = ""
+
     if intent == "Intent Busqueda Hoteles":
         responseText = webhookSearchHotels(req)
     elif intent == "get-agent-name":
