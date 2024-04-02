@@ -8,6 +8,7 @@ from datetime import datetime
 from django.db.models import Field
 from django.db.models.lookups import In
 import unidecode
+import functions_framework
 
 @Field.register_lookup
 class IIn(In):
@@ -71,8 +72,11 @@ class Hotel_APIView(APIView):
         precioMax = float(request.GET.get('precioMax', ''))
         hotels = Hotel.objects.filter(city__iin = ciudad).order_by("-stars")[:3]
         hotels = searchRooms(hotels, residentes, fechaInicio, fechaFin, precioMax)
-        serializer = RoomSerializers(hotels, many=True)
-        
+        serializer = RoomSerializers(data=hotels, many=True)
+
+        serializer.is_valid()
+        data = serializer.data
+
         return Response(serializer.data)
 
 class Flight_APIView(APIView):
@@ -135,3 +139,43 @@ class ActivityType_APIView(APIView):
         activities = Activity.objects.values_list('type', flat=True).distinct()
         
         return Response(activities)
+
+@functions_framework.http
+def handleWebhook(request):
+    req = request.get_json()
+    intent = req["queryResult"]["intent"]["displayName"]
+
+    if intent == "Intent Busqueda Hoteles":
+        responseText = webhookSearchHotels(req)
+    elif intent == "get-agent-name":
+        responseText = "My name is Flowhook"
+    else:
+        responseText = f"There are no fulfillment responses defined for Intent {intent}"
+
+    res = {"fulfillmentMessages": [{"text": {"text": [responseText]}}]}
+
+    return res
+
+def webhookSearchHotels(req):
+    ciudad = req["queryResult"]["parameters"]["ciudad"]
+    residentes = req["queryResult"]["parameters"]["residentes"]
+    fechaInicio = req["queryResult"]["parameters"]["fechaInicio"]
+    fechaFin = req["queryResult"]["parameters"]["fechaFin"]
+    precioMax = req["queryResult"]["parameters"]["precioMax"]
+    responseText = ""
+
+    hotels = Hotel.objects.filter(city__iin = ciudad).order_by("-stars")[:3]
+    hotels = searchRooms(hotels, residentes, fechaInicio, fechaFin, precioMax)
+    serializer = RoomSerializers(data=hotels, many=True)
+    serializer.is_valid()
+    data = serializer.data
+
+    if(len(data) == 0):
+        responseText = "Lo siento, pero no he podido encontrar hoteles que cumplan todas tus necesidades. ¿Puedo ayudarte con otra cosa?"
+    else:
+        responseText = "Esto es lo que he encontrado: \n"
+        for d in data:
+            responseText += "Habitación para " + str(d["capacity"]) + " en " + d["name"] + ", " + d["address"] + ", por " + str(d["price"]) + "€ por noche. \n" + "Teléfono de contacto: " + d["phone"] + "\n" + "Estrellas: " + str(d["stars"]) + "\n\n"
+        responseText += "Espero que te sea útil. ¿Puedo ayudarte con algo más?"
+
+    return responseText
