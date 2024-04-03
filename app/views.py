@@ -200,14 +200,14 @@ def webhookSearchFlights(req):
     precioMax = float(req['queryResult']['parameters']['precioMax'])
     responseText = ""
 
-    flights = Flight.objects.filter(destination__iin=destino).filter(departure__iin=origen).filter(departureDate=fechaSalida).filter(returnDate=fechaRegreso).filter(price__lte=precioMax).filter(remainingSeats__gte=viajeros).order_by("price")[:3]
+    flights = Flight.objects.filter(destination=destino).filter(departure=origen).filter(departureDate=fechaSalida).filter(returnDate=fechaRegreso).filter(price__lte=precioMax).filter(remainingSeats__gte=viajeros).order_by("price")[:3]
 
     if(len(flights) == 0):
         responseText = {"fulfillmentMessages": [{"text": {"text": ["Lo siento, pero no he podido encontrar vuelos que cumplan todas tus necesidades. ¿Puedo ayudarte con otra cosa?"]}}]}
     else:
         responseText = {"fulfillmentMessages": [{"text": {"text": ["Esto es lo que he encontrado: "]}}]}
         for d in flights:
-            responseText["fulfillmentMessages"].append({"text": {"text": ["Vuelo destino " + d.destination + ", desde " + d.origin + ", por " + d.price + " cada ticket. " + d.remainingSeats + " asientos disponibles."]}})
+            responseText["fulfillmentMessages"].append({"text": {"text": ["Vuelo con " + d.airline +  " destino " + d.destination + ", desde " + d.origin + ", por " + d.price + " cada ticket. " + d.remainingSeats + " asientos disponibles."]}})
             responseText["fulfillmentMessages"].append({"text": {"text": ["Fecha de salida: " + d.departureDate]}})
             responseText["fulfillmentMessages"].append({"text": {"text": ["Horario del vuelo de ida: " + d.departureDepartureTime + " - " + d.departureArrivalTime]}})
             responseText["fulfillmentMessages"].append({"text": {"text": ["Fecha de regreso: " + d.returnDate]}})
