@@ -161,6 +161,7 @@ def handleWebhook(request):
 
 def webhookSearchHotels(req):
     ciudad = req['queryResult']['parameters']['ciudad']
+    ciudad = unidecode.unidecode(ciudad)
     residentes = int(req['queryResult']['parameters']['residentes'])
     fechaInicio = req['queryResult']['parameters']['fechaInicio'][0:10]
     fechaInicio = datetime.strptime(fechaInicio, '%Y-%m-%d').date()
@@ -188,7 +189,9 @@ def webhookSearchHotels(req):
 
 def webhookSearchFlights(req):
     origen = req['queryResult']['parameters']['origen']
+    origen = unidecode.unidecode(origen)
     destino = req['queryResult']['parameters']['destino']
+    destino = unidecode.unidecode(destino)
     viajeros = int(req['queryResult']['parameters']['viajeros'])
     fechaSalida = req['queryResult']['parameters']['fechaSalida'][0:10]
     fechaSalida = datetime.strptime(fechaSalida, '%Y-%m-%d').date()
