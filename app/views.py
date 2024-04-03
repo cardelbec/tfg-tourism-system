@@ -229,7 +229,7 @@ def webhookSearchActivityTypes(req):
 
     activities = Activity.objects.values_list('type', flat=True).distinct()
 
-    responseText = {"fulfillmentMessages": [{"text": {"text": ["De acuerdo, te ayudaré a encontrar actividades turísticas. Dime qué te interesa de los siguientes tipos de actividad disponibles:"]}}]}
+    responseText = {"fulfillmentMessages": [{"text": {"text": ["De acuerdo, te ayudaré a encontrar actividades turísticas. Dime cuál de los siguientes tipos de actividad te interesa:"]}}]}
     for d in activities:
         responseText["fulfillmentMessages"].append({"text": {"text": [d]}})
         responseText["fulfillmentMessages"].append({"text": {"text": [""]}})
