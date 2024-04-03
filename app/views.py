@@ -150,8 +150,8 @@ def handleWebhook(request):
 
     if intent == "Intent Busqueda Hoteles":
         responseText = webhookSearchHotels(req)
-    elif intent == "get-agent-name":
-        responseText = "My name is Flowhook"
+    elif intent == "Intent Busqueda Vuelos":
+        responseText = webhookSearchFlights(req)
     else:
         responseText = f"There are no fulfillment responses defined for Intent {intent}"
 
@@ -161,12 +161,12 @@ def handleWebhook(request):
 
 def webhookSearchHotels(req):
     ciudad = req['queryResult']['parameters']['ciudad']
-    residentes = req['queryResult']['parameters']['residentes']
+    residentes = int(req['queryResult']['parameters']['residentes'])
     fechaInicio = req['queryResult']['parameters']['fechaInicio'][0:10]
     fechaInicio = datetime.strptime(fechaInicio, '%Y-%m-%d').date()
     fechaFin = req['queryResult']['parameters']['fechaFin'][0:10]
     fechaFin= datetime.strptime(fechaFin, '%Y-%m-%d').date()
-    precioMax = int(req['queryResult']['parameters']['precioMax'])
+    precioMax = float(req['queryResult']['parameters']['precioMax'])
     responseText = ""
 
     hotels = Hotel.objects.filter(city = ciudad).order_by("-stars")[:3]
@@ -180,6 +180,35 @@ def webhookSearchHotels(req):
             responseText["fulfillmentMessages"].append({"text": {"text": ["Habitación para " + str(d.capacity) + " en " + d.hotel.name + ", " + d.hotel.address + ", por " + str(d.price) + "€ por noche."]}})
             responseText["fulfillmentMessages"].append({"text": {"text": ["Teléfono de contacto: " + d.hotel.phone]}})
             responseText["fulfillmentMessages"].append({"text": {"text": ["Estrellas: " + str(d.hotel.stars)]}})
+            responseText["fulfillmentMessages"].append({"text": {"text": [""]}})
+
+        responseText["fulfillmentMessages"].append({"text": {"text": ["Espero que te sea útil. ¿Puedo ayudarte con algo más?"]}})
+
+    return responseText
+
+def webhookSearchFlights(req):
+    origen = req['queryResult']['parameters']['origen']
+    destino = req['queryResult']['parameters']['destino']
+    viajeros = int(req['queryResult']['parameters']['viajeros'])
+    fechaSalida = req['queryResult']['parameters']['fechaSalida'][0:10]
+    fechaSalida = datetime.strptime(fechaSalida, '%Y-%m-%d').date()
+    fechaRegreso = req['queryResult']['parameters']['fechaRegreso'][0:10]
+    fechaRegreso= datetime.strptime(fechaRegreso, '%Y-%m-%d').date()
+    precioMax = float(req['queryResult']['parameters']['precioMax'])
+    responseText = ""
+
+    flights = Flight.objects.filter(destination__iin=destino).filter(departure__iin=origen).filter(departureDate=fechaSalida).filter(returnDate=fechaRegreso).filter(price__lte=precioMax).filter(remainingSeats__gte=viajeros).order_by("price")[:3]
+
+    if(len(flights) == 0):
+        responseText = {"fulfillmentMessages": [{"text": {"text": ["Lo siento, pero no he podido encontrar vuelos que cumplan todas tus necesidades. ¿Puedo ayudarte con otra cosa?"]}}]}
+    else:
+        responseText = {"fulfillmentMessages": [{"text": {"text": ["Esto es lo que he encontrado: "]}}]}
+        for d in flights:
+            responseText["fulfillmentMessages"].append({"text": {"text": ["Vuelo destino " + d.destination + ", desde " + d.origin + ", por " + d.price + " cada ticket. " + d.remainingSeats + " asientos disponibles."]}})
+            responseText["fulfillmentMessages"].append({"text": {"text": ["Fecha de salida: " + d.departureDate]}})
+            responseText["fulfillmentMessages"].append({"text": {"text": ["Horario del vuelo de ida: " + d.departureDepartureTime + " - " + d.departureArrivalTime]}})
+            responseText["fulfillmentMessages"].append({"text": {"text": ["Fecha de regreso: " + d.returnDate]}})
+            responseText["fulfillmentMessages"].append({"text": {"text": ["Horario del vuelo de regreso: " + d.returnDepartureTime + " - " + d.returnArrivalTime]}})
             responseText["fulfillmentMessages"].append({"text": {"text": [""]}})
 
         responseText["fulfillmentMessages"].append({"text": {"text": ["Espero que te sea útil. ¿Puedo ayudarte con algo más?"]}})
