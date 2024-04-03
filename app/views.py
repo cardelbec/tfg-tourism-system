@@ -76,9 +76,6 @@ class Hotel_APIView(APIView):
         hotels = searchRooms(hotels, residentes, fechaInicio, fechaFin, precioMax)
         serializer = RoomSerializers(data=hotels, many=True)
 
-        serializer.is_valid()
-        data = serializer.data
-
         return Response(serializer.data)
 
 class Flight_APIView(APIView):
@@ -168,21 +165,18 @@ def webhookSearchHotels(req):
     fechaInicio = datetime.strptime(fechaInicio, '%Y-%m-%d').date()
     fechaFin = req['queryResult']['parameters']['fechaFin'][0:10]
     fechaFin= datetime.strptime(fechaFin, '%Y-%m-%d').date()
-    precioMax = req['queryResult']['parameters']['precioMax']
+    precioMax = int(req['queryResult']['parameters']['precioMax'])
     responseText = ""
 
-    hotels = Hotel.objects.filter(city__iin = ciudad).order_by("-stars")[:3]
+    hotels = Hotel.objects.filter(city = ciudad).order_by("-stars")[:3]
     hotels = searchRooms(hotels, residentes, fechaInicio, fechaFin, precioMax)
-    serializer = RoomSerializers(data=hotels, many=True)
-    serializer.is_valid()
-    data = serializer.data
 
-    if(len(data) == 0):
+    if(len(hotels) == 0):
         responseText = "Lo siento, pero no he podido encontrar hoteles que cumplan todas tus necesidades. ¿Puedo ayudarte con otra cosa?"
     else:
         responseText = "Esto es lo que he encontrado: \n"
-        for d in data:
-            responseText += "Habitación para " + str(d["capacity"]) + " en " + d["name"] + ", " + d["address"] + ", por " + str(d["price"]) + "€ por noche. \n" + "Teléfono de contacto: " + d["phone"] + "\n" + "Estrellas: " + str(d["stars"]) + "\n\n"
+        for d in hotels:
+            responseText += "Habitación para " + str(d.capacity) + " en " + d.hotel.name + ", " + d.hotel.address + ", por " + str(d.price) + "€ por noche. \n" + "Teléfono de contacto: " + d.hotel.phone+ "\n" + "Estrellas: " + str(d.hotel.stars) + "\n\n"
         responseText += "Espero que te sea útil. ¿Puedo ayudarte con algo más?"
 
     return responseText
