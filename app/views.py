@@ -155,9 +155,9 @@ def handleWebhook(request):
     else:
         responseText = f"There are no fulfillment responses defined for Intent {intent}"
 
-    res = {"fulfillmentMessages": [{"text": {"text": [responseText]}}]}
+    #res = {"fulfillmentMessages": [{"text": {"text": [responseText]}}]}
 
-    return JsonResponse(res, safe=False)
+    return JsonResponse(responseText, safe=False)
 
 def webhookSearchHotels(req):
     ciudad = req['queryResult']['parameters']['ciudad']
@@ -173,11 +173,15 @@ def webhookSearchHotels(req):
     hotels = searchRooms(hotels, residentes, fechaInicio, fechaFin, precioMax)
 
     if(len(hotels) == 0):
-        responseText = "Lo siento, pero no he podido encontrar hoteles que cumplan todas tus necesidades. ¿Puedo ayudarte con otra cosa?"
+        responseText = {"fulfillmentMessages": [{"text": {"text": ["Lo siento, pero no he podido encontrar hoteles que cumplan todas tus necesidades. ¿Puedo ayudarte con otra cosa?"]}}]}
     else:
-        responseText = "Esto es lo que he encontrado: \n"
+        responseText = {"fulfillmentMessages": [{"text": {"text": ["Esto es lo que he encontrado: "]}}]}
         for d in hotels:
-            responseText += "Habitación para " + str(d.capacity) + " en " + d.hotel.name + ", " + d.hotel.address + ", por " + str(d.price) + "€ por noche. \n" + "Teléfono de contacto: " + d.hotel.phone+ "\n" + "Estrellas: " + str(d.hotel.stars) + "\n\n"
-        responseText += "Espero que te sea útil. ¿Puedo ayudarte con algo más?"
+            responseText["fulfillmentMessages"].append({"text": {"text": ["Habitación para " + str(d.capacity) + " en " + d.hotel.name + ", " + d.hotel.address + ", por " + str(d.price) + "€ por noche."]}})
+            responseText["fulfillmentMessages"].append({"text": {"text": ["Teléfono de contacto: " + d.hotel.phone]}})
+            responseText["fulfillmentMessages"].append({"text": {"text": ["Estrellas: " + str(d.hotel.stars)]}})
+            responseText["fulfillmentMessages"].append({"text": {"text": [""]}})
+
+        responseText["fulfillmentMessages"].append({"text": {"text": ["Espero que te sea útil. ¿Puedo ayudarte con algo más?"]}})
 
     return responseText
