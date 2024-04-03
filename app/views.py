@@ -11,6 +11,7 @@ import unidecode
 import functions_framework
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.http import HttpResponse, JsonResponse
 
 @Field.register_lookup
 class IIn(In):
@@ -156,7 +157,7 @@ def handleWebhook(request):
 
     res = {"fulfillmentMessages": [{"text": {"text": [responseText]}}]}
 
-    return res
+    return JsonResponse(res, safe=False)
 
 def webhookSearchHotels(req):
     ciudad = req['queryResult']['parameters']['ciudad']
