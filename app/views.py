@@ -154,10 +154,8 @@ def handleWebhook(request):
         responseText = webhookSearchHotels(req)
     elif intent == "Intent Busqueda Vuelos":
         responseText = webhookSearchFlights(req)
-    else:
-        responseText = f"There are no fulfillment responses defined for Intent {intent}"
-
-    #res = {"fulfillmentMessages": [{"text": {"text": [responseText]}}]}
+    elif intent == "Intent Busqueda Actividades":
+        responseText = webhookSearchActivityTypes(req)
 
     return JsonResponse(responseText, safe=False)
 
@@ -217,5 +215,17 @@ def webhookSearchFlights(req):
             responseText["fulfillmentMessages"].append({"text": {"text": [""]}})
 
         responseText["fulfillmentMessages"].append({"text": {"text": ["Espero que te sea útil. ¿Puedo ayudarte con algo más?"]}})
+
+    return responseText
+
+def webhookSearchActivityTypes(req):
+    responseText = ""
+
+    activities = Activity.objects.values_list('type', flat=True).distinct()
+
+    responseText = {"fulfillmentMessages": [{"text": {"text": ["De acuerdo, te ayudaré a encontrar actividades turísticas. Dime qué te interesa de los siguientes tipos de actividad disponibles:"]}}]}
+    for d in activities:
+        responseText["fulfillmentMessages"].append({"text": {"text": [d]}})
+        responseText["fulfillmentMessages"].append({"text": {"text": [""]}})
 
     return responseText
