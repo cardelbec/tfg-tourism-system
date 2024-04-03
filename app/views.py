@@ -243,12 +243,12 @@ def webhookSearchActivities(req):
     ciudad = unidecode.unidecode(ciudad)
     fecha = req['queryResult']['parameters']['fecha'][0:10]
     fecha = datetime.strptime(fecha, '%Y-%m-%d').date()
-    hora = req['queryResult']['parameters']['hora']
+    hora = req['queryResult']['parameters']['hora'][11:19]
     hora = datetime.strptime(hora, '%H:%M:%S').time()
     precioMax = float(req['queryResult']['parameters']['precioMax'])
     responseText = ""
 
-    activities = Activity.objects.filter(city__iin=ciudad).filter(type=tipo).filter(date=fecha).filter(startTime__gte=hora).filter(price__lte=precioMax).order_by("price")[:3]
+    activities = Activity.objects.filter(city=ciudad).filter(type=tipo).filter(date=fecha).filter(startTime__gte=hora).filter(price__lte=precioMax).order_by("price")[:3]
 
     if(len(activities) == 0):
         responseText = {"fulfillmentMessages": [{"text": {"text": ["Lo siento, pero no he podido encontrar actividades que cumplan todas tus necesidades. ¿Puedo ayudarte con otra cosa?"]}}]}
@@ -257,12 +257,12 @@ def webhookSearchActivities(req):
         for d in activities:
             responseText["fulfillmentMessages"].append({"text": {"text": [d.title]}})
             responseText["fulfillmentMessages"].append({"text": {"text": [d.description]}})
-            responseText["fulfillmentMessages"].append({"text": {"text": ["Empieza a las " + d.startTime + " del " + d.date + ", y dura " + d.duration + " horas"]}})
+            responseText["fulfillmentMessages"].append({"text": {"text": ["Empieza a las " + str(d.startTime)[0:5] + " del " + str(d.date) + ", y dura " + str(d.duration) + " horas"]}})
             responseText["fulfillmentMessages"].append({"text": {"text": ["Ubicación: " + d.address + ", " + d.city]}})
             if(d.price == 0):
                 responseText["fulfillmentMessages"].append({"text": {"text": ["Precio por persona: gratuito"]}})
             else:
-                responseText["fulfillmentMessages"].append({"text": {"text": ["Precio por persona: " + d.price]}})
+                responseText["fulfillmentMessages"].append({"text": {"text": ["Precio por persona: " + str(d.price)]}})
             responseText["fulfillmentMessages"].append({"text": {"text": ["Teléfono de contacto: " + d.phone]}})
             responseText["fulfillmentMessages"].append({"text": {"text": [""]}})
 
