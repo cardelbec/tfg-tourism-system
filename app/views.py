@@ -207,11 +207,11 @@ def webhookSearchFlights(req):
     else:
         responseText = {"fulfillmentMessages": [{"text": {"text": ["Esto es lo que he encontrado: "]}}]}
         for d in flights:
-            responseText["fulfillmentMessages"].append({"text": {"text": ["Vuelo con " + d.airline +  " destino " + d.destination + ", desde " + d.departure + ", por " + str(d.price) + " cada ticket. " + str(d.remainingSeats) + " asientos disponibles."]}})
+            responseText["fulfillmentMessages"].append({"text": {"text": ["Vuelo con " + d.airline +  " destino " + d.destination + ", desde " + d.departure + ", por " + str(d.price) + "€ cada ticket. " + str(d.remainingSeats) + " asientos disponibles."]}})
             responseText["fulfillmentMessages"].append({"text": {"text": ["Fecha de salida: " + str(d.departureDate)]}})
-            responseText["fulfillmentMessages"].append({"text": {"text": ["Horario del vuelo de ida: " + str(d.departureDepartureTime) + " - " + str(d.departureArrivalTime)]}})
+            responseText["fulfillmentMessages"].append({"text": {"text": ["Horario del vuelo de ida: " + str(d.departureDepartureTime)[0:5] + " - " + str(d.departureArrivalTime)[0:5]]}})
             responseText["fulfillmentMessages"].append({"text": {"text": ["Fecha de regreso: " + str(d.returnDate)]}})
-            responseText["fulfillmentMessages"].append({"text": {"text": ["Horario del vuelo de regreso: " + str(d.returnDepartureTime) + " - " + str(d.returnArrivalTime)]}})
+            responseText["fulfillmentMessages"].append({"text": {"text": ["Horario del vuelo de regreso: " + str(d.returnDepartureTime)[0:5] + " - " + str(d.returnArrivalTime)[0:5]]}})
             responseText["fulfillmentMessages"].append({"text": {"text": [""]}})
 
         responseText["fulfillmentMessages"].append({"text": {"text": ["Espero que te sea útil. ¿Puedo ayudarte con algo más?"]}})
