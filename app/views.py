@@ -54,6 +54,8 @@ def searchRooms(hotels, residentes, fechaInicio, fechaFin, precioMax):
 
         return filteredHotels
 
+#API REST
+
 class Hotel_APIView(APIView):
 
     @extend_schema(responses= RoomSerializers(many=True),
@@ -142,6 +144,8 @@ class ActivityType_APIView(APIView):
         
         return Response(activities)
 
+#WEBHOOK DIALOGFLOW
+
 @functions_framework.http
 @csrf_exempt
 def handleWebhook(request):
@@ -156,6 +160,8 @@ def handleWebhook(request):
         responseText = webhookSearchFlights(req)
     elif intent == "Intent Busqueda Actividades":
         responseText = webhookSearchActivityTypes(req)
+    elif intent == "Intent Busqueda Actividades - Followup":
+        responseText = webhookSearchActivities(req)
 
     return JsonResponse(responseText, safe=False)
 
@@ -227,5 +233,39 @@ def webhookSearchActivityTypes(req):
     for d in activities:
         responseText["fulfillmentMessages"].append({"text": {"text": [d]}})
         responseText["fulfillmentMessages"].append({"text": {"text": [""]}})
+
+    return responseText
+
+def webhookSearchActivities(req):
+    tipo = req['queryResult']['parameters']['tipo']
+    tipo = unidecode.unidecode(tipo)
+    ciudad = req['queryResult']['parameters']['ciudad']
+    ciudad = unidecode.unidecode(ciudad)
+    fecha = req['queryResult']['parameters']['fecha'][0:10]
+    fecha = datetime.strptime(fecha, '%Y-%m-%d').date()
+    hora = req['queryResult']['parameters']['hora']
+    hora = datetime.strptime(hora, '%H:%M:%S').time()
+    precioMax = float(req['queryResult']['parameters']['precioMax'])
+    responseText = ""
+
+    activities = Activity.objects.filter(city__iin=ciudad).filter(type=tipo).filter(date=fecha).filter(startTime__gte=hora).filter(price__lte=precioMax).order_by("price")[:3]
+
+    if(len(activities) == 0):
+        responseText = {"fulfillmentMessages": [{"text": {"text": ["Lo siento, pero no he podido encontrar actividades que cumplan todas tus necesidades. ¿Puedo ayudarte con otra cosa?"]}}]}
+    else:
+        responseText = {"fulfillmentMessages": [{"text": {"text": ["Esto es lo que he encontrado: "]}}]}
+        for d in activities:
+            responseText["fulfillmentMessages"].append({"text": {"text": [d.title]}})
+            responseText["fulfillmentMessages"].append({"text": {"text": [d.description]}})
+            responseText["fulfillmentMessages"].append({"text": {"text": ["Empieza a las " + d.startTime + " del " + d.date + ", y dura " + d.duration + " horas"]}})
+            responseText["fulfillmentMessages"].append({"text": {"text": ["Ubicación: " + d.address + ", " + d.city]}})
+            if(d.price == 0):
+                responseText["fulfillmentMessages"].append({"text": {"text": ["Precio por persona: gratuito"]}})
+            else:
+                responseText["fulfillmentMessages"].append({"text": {"text": ["Precio por persona: " + d.price]}})
+            responseText["fulfillmentMessages"].append({"text": {"text": ["Teléfono de contacto: " + d.phone]}})
+            responseText["fulfillmentMessages"].append({"text": {"text": [""]}})
+
+        responseText["fulfillmentMessages"].append({"text": {"text": ["Espero que te sea útil. ¿Puedo ayudarte con algo más?"]}})
 
     return responseText
