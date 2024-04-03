@@ -39,7 +39,7 @@ def searchRooms(hotels, residentes, fechaInicio, fechaFin, precioMax):
             rooms = Room.objects.filter(hotel_id = h.id)
             for r in rooms:
                 precioTotal = r.price*(fechaFin - fechaInicio).days
-                if precioTotal <= precioMax and r.capacity == residentes: 
+                if precioTotal <= precioMax and r.capacity == residentes and fechaInicio < fechaFin: 
                     goodRoom = True
                     bookings = Booking.objects.filter(room_id = r.id)
                     for b in bookings:
@@ -47,6 +47,7 @@ def searchRooms(hotels, residentes, fechaInicio, fechaFin, precioMax):
                         bookingEnd = b.end
                         if not((fechaInicio < bookingStart and fechaFin < bookingStart) or (fechaInicio > bookingEnd and fechaFin > bookingEnd)):
                             goodRoom = False
+                            filteredHotels = []
                             break
                     if goodRoom:
                         filteredHotels.append(r)
@@ -76,6 +77,7 @@ class Hotel_APIView(APIView):
         hotels = Hotel.objects.filter(city__iin = ciudad).order_by("-stars")[:3]
         hotels = searchRooms(hotels, residentes, fechaInicio, fechaFin, precioMax)
         serializer = RoomSerializers(data=hotels, many=True)
+        serializer.is_valid()
 
         return Response(serializer.data)
 
