@@ -127,7 +127,7 @@ class Activity_APIView(APIView):
         for i in range(len(ciudad)):
             ciudad[i] = unidecode.unidecode(ciudad[i])
         tipo = request.GET.get('tipo', '')
-        fechaInicio = request.GET.get('fecha', '')
+        fechaInicio = request.GET.get('fechaInicio', '')
         fechaInicio = datetime.strptime(fechaInicio, '%Y-%m-%d').date()
         hora = request.GET.get('hora', '')
         hora = datetime.strptime(hora, '%H:%M:%S').time()
