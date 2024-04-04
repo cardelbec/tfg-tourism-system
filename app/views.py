@@ -119,6 +119,7 @@ class Activity_APIView(APIView):
         OpenApiParameter(name='ciudad',location=OpenApiParameter.QUERY, description='Ciudad de la actividad', required=True, type=str),
         OpenApiParameter(name='tipo',location=OpenApiParameter.QUERY, description='Tipo de actividad', required=True, type=str),
         OpenApiParameter(name='fechaInicio',location=OpenApiParameter.QUERY, description='Fecha de la actividad', required=True, type=str),
+        OpenApiParameter(name='hora',location=OpenApiParameter.QUERY, description='Hora a la que empieza la actividad', required=True, type=str),
         OpenApiParameter(name='precioMax',location=OpenApiParameter.QUERY, description='Precio máximo de la actividad', required=True, type=str),
     ],)
     def get(self, request, format=None, *args, **kwargs):
@@ -126,8 +127,8 @@ class Activity_APIView(APIView):
         for i in range(len(ciudad)):
             ciudad[i] = unidecode.unidecode(ciudad[i])
         tipo = request.GET.get('tipo', '')
-        fecha = request.GET.get('fecha', '')
-        fecha = datetime.strptime(fecha, '%Y-%m-%d').date()
+        fechaInicio = request.GET.get('fecha', '')
+        fechaInicio = datetime.strptime(fechaInicio, '%Y-%m-%d').date()
         hora = request.GET.get('hora', '')
         hora = datetime.strptime(hora, '%H:%M:%S').time()
         precioMax = float(request.GET.get('precioMax', ''))
