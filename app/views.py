@@ -132,7 +132,7 @@ class Activity_APIView(APIView):
         hora = request.GET.get('hora', '')
         hora = datetime.strptime(hora, '%H:%M:%S').time()
         precioMax = float(request.GET.get('precioMax', ''))
-        activities = Activity.objects.filter(city__iin=ciudad).filter(type=tipo).filter(date=fecha).filter(startTime__gte=hora).filter(price__lte=precioMax).order_by("price")[:3]
+        activities = Activity.objects.filter(city__iin=ciudad).filter(type=tipo).filter(date=fechaInicio).filter(startTime__gte=hora).filter(price__lte=precioMax).order_by("price")[:3]
         serializer = ActivitySerializers(activities, many=True)
         
         return Response(serializer.data)
