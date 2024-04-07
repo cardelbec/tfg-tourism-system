@@ -11,7 +11,8 @@ import unidecode
 import functions_framework
 from django.views.decorators.csrf import csrf_exempt
 import json
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
+from django.shortcuts import render
 
 @Field.register_lookup
 class IIn(In):
@@ -53,6 +54,12 @@ def searchRooms(hotels, residentes, fechaInicio, fechaFin, precioMax):
                         filteredHotels.append(r)
 
         return filteredHotels
+
+def home(request):
+    return render(request, "home.html", {})
+
+def watsonBot(request):
+    return render(request, "watson.html", {})
 
 #API REST
 

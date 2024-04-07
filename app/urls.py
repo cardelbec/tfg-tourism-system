@@ -2,6 +2,8 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
+    path('', home),
+    path('watson/', watsonBot),
     path('hotel/', Hotel_APIView.as_view()),
     path('flight/', Flight_APIView.as_view()),
     path('activity/', Activity_APIView.as_view()),
