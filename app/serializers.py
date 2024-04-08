@@ -13,10 +13,11 @@ class RoomSerializers(serializers.ModelSerializer):
     address = serializers.SerializerMethodField('get_hotel_address')
     phone = serializers.SerializerMethodField('get_hotel_phone')
     stars = serializers.SerializerMethodField('get_hotel_stars')
+    image = serializers.SerializerMethodField('get_hotel_image')
 
     class Meta:
         model = Room
-        fields = ['capacity', 'price', 'name', 'address', 'phone', 'stars']
+        fields = ['capacity', 'price', 'name', 'address', 'phone', 'stars', 'image']
 
     def get_hotel_name(self, room):
         name = room.hotel.name
@@ -33,6 +34,10 @@ class RoomSerializers(serializers.ModelSerializer):
     def get_hotel_stars(self, room):
         stars = room.hotel.stars
         return stars
+    
+    def get_hotel_image(self, room):
+        image = room.hotel.image
+        return image
 
 class FlightSerializers(serializers.ModelSerializer):
     class Meta:
