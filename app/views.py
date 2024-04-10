@@ -195,7 +195,9 @@ def webhookSearchHotels(req):
             responseText["fulfillmentMessages"].append({"text": {"text": ["Habitación para " + str(d.capacity) + " en " + d.hotel.name + ", " + d.hotel.address + ", por " + str(d.price) + "€ por noche."]}})
             responseText["fulfillmentMessages"].append({"text": {"text": ["Teléfono de contacto: " + d.hotel.phone]}})
             responseText["fulfillmentMessages"].append({"text": {"text": ["Estrellas: " + str(d.hotel.stars)]}})
+            responseText["fulfillmentMessages"].append({"image": {"imageUri": str(d.hotel.image), "accessibilityText": "Imagen del hotel"}})
             responseText["fulfillmentMessages"].append({"text": {"text": [""]}})
+            
 
         responseText["fulfillmentMessages"].append({"text": {"text": ["Espero que te sea útil. ¿Puedo ayudarte con algo más?"]}})
 
